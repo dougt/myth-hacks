@@ -1,0 +1,391 @@
+Index: mythweb/modules/tv/tmpl/default/detail.php
+===================================================================
+--- mythweb/modules/tv/tmpl/default/detail.php	(revision 24736)
++++ mythweb/modules/tv/tmpl/default/detail.php	(working copy)
+@@ -40,7 +40,11 @@
+ 
+ <script type="text/javascript">
+ <!--
++   document.onload = function() {
++     window.alert("a");
+ 
++
++  }
+ // Keep track of the autoexpire flag
+     var autoexpire = <?php echo $program->auto_expire ? 1 : 0 ?>;
+ 
+@@ -525,155 +529,18 @@
+         <div id="x-downloads">
+ 
+             <div class="x-pixmap">
+-<?php   if (setting('WebFLV_on')) { ?>
+-<?php       if (file_exists('modules/tv/flowplayer-3.1.1.swf')) { ?>
+ 
++	    <video id="video"
++	    	   poster="<?php echo $program->thumb_url($flv_w,0) ?>"
++		   controls
++		   preload="none"
++		   width="<?php echo $flv_w ?> px"
++                   height="<?php echo $flv_h ?> px"
++		   duration="<?php echo $program->length ?>" >
++	       <source src="<?php echo video_url($program, 'mp4'); ?>" type="video/mp4" />
++	       <source src="<?php echo video_url($program, 'ogg'); ?>.ogg" type="video/ogg" />
++	    </video>
+ 
+-          <!-- this A tag is where your Flowplayer will be placed. it can be anywhere -->
+-            <a href=""
+-                style="display:block;width:<?php echo $flv_w ?>px;height:<?php echo $flv_h ?>px"
+-                id="player">
+-            </a>
+-
+-            <!-- this will install flowplayer inside previous A- tag. -->
+-            <script>
+-                flowplayer(
+-                    "player",
+-                    "<?php echo root_url ?>tv/flowplayer-3.1.1.swf", {
+-                    playlist: [
+-                        // this first PNG clip works as a splash image
+-                        {
+-                            url: '<?php echo $program->thumb_url($flv_w,0) ?>',
+-                            scaling: 'orig'
+-                            },
+-                        // Then we have the video
+-                        {
+-                            url: "<?php echo video_url($program, 'flv'); ?>",
+-                            duration: <?php echo $program->length ?>,
+-                            autoPlay: false,
+-                            // Would be nice to auto-buffer, but we don't want to
+-                            // waste bandwidth and CPU on the remote machine.
+-                            autoBuffering: false
+-                            }
+-                        ]}
+-                    );
+-            </script>
+-<?php       } elseif (file_exists('modules/tv/MFPlayer.swf')) { ?>
+-                    <script langfuage="JavaScript" type="text/javascript">
+-                    <!--
+-                    // Version check for the Flash Player that has the ability to start Player Product Install (6.0r65)
+-                    var hasProductInstall = DetectFlashVer(6, 0, 65);
+-
+-                    // Version check based upon the values defined in globals
+-                    var hasRequestedVersion = DetectFlashVer(requiredMajorVersion, requiredMinorVersion, requiredRevision);
+-
+-                    // Check to see if a player with Flash Product Install is available and the version does not meet the requirements for playback
+-                    if ( hasProductInstall && !hasRequestedVersion ) {
+-                        // MMdoctitle is the stored document.title value used by
+-                        // the installation process to close the window that
+-                        // started the process.   This is necessary in order to
+-                        // close browser windows that are still utilizing the
+-                        // older version of the player after installation has
+-                        // completed
+-
+-                        // DO NOT MODIFY THE FOLLOWING FOUR LINES
+-                        // Location visited after installation is complete if
+-                        // installation is required
+-                        var MMPlayerType  = (isIE == true) ? "ActiveX" : "PlugIn";
+-                        var MMredirectURL = window.location;
+-                        var MMdoctitle    = document.title;
+-                        document.title    = document.title.slice(0, 47)
+-                                            +" - Flash Player Installation";
+-
+-                        AC_FL_RunContent(
+-                                "src",              "playerProductInstall",
+-                                "FlashVars",        "MMredirectURL="+MMredirectURL
+-                                                    +'&MMplayerType='+MMPlayerType
+-                                                    +'&MMdoctitle='+MMdoctitle,
+-                                "width",            "<?php echo $flv_w ?>",
+-                                "height",           "<?php echo $flv_h ?>",
+-                                "align",            "middle",
+-                                "id",               "MFPlayer",
+-                                "quality",          "high",
+-                                "bgcolor",          "#869ca7",
+-                                "name",             "MFPlayer",
+-                                "allowScriptAccess","sameDomain",
+-                                "movie",            "<?php echo root_url; ?>tv/playerProductInstall",
+-                                "type",             "application/x-shockwave-flash",
+-                                "pluginspage",      "http://www.adobe.com/go/getflashplayer"
+-                            );
+-                    } else if (hasRequestedVersion) {
+-                        // If we've detected an acceptable version, embed
+-                        // the Flash Content SWF when all tests are passed
+-                        AC_FL_RunContent(
+-                                "src",              "MFPlayer",
+-                                "width",            "<?php echo $flv_w ?>",
+-                                "height",           "<?php echo $flv_h ?>",
+-                                "align",            "middle",
+-                                "id",               "MFPlayer",
+-                                "quality",          "high",
+-                                "bgcolor",          "#869ca7",
+-                                "name",             "MFPlayer",
+-                                "flashvars",'file=<?php     echo video_url($program, 'flv');
+-                                         ?>&still=<?php     echo $program->thumb_url($flv_w,$flv_h);
+-                                         ?>&totalTime=<?php echo $program->length;
+-                                         ?>&width=<?php     echo $flv_w;
+-                                         ?>&height=<?php    echo $flv_h;
+-                                         ?>&styles=<?php    echo root_url ?>tv/MFPlayer_styles.swf',
+-                                "allowScriptAccess","sameDomain",
+-                                "allowFullScreen",  "true",
+-                                "movie",            "<?php echo root_url; ?>tv/MFPlayer",
+-                                "type",             "application/x-shockwave-flash",
+-                                "pluginspage",      "http://www.adobe.com/go/getflashplayer"
+-                            );
+-                    } else {  // flash is too old or we can't detect the plugin
+-                        document.write('<img src="<?php echo $program->thumb_url($flv_w,0) ?>"'
+-                                      +' width="<?php echo $flv_w ?>"><br>'
+-                                      +'Web-based video playback requires the '
+-                                      +'<a href=http://www.adobe.com/go/getflash/>Adobe Flash Player</a>.'
+-                                      );
+-                    }
+-                    // -->
+-                    </script>
+-                    <noscript>
+-                    <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+-                        id="MFPlayer" width="<?php echo $flv_w ?>" height="<?php echo $flv_h ?>"
+-                        codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
+-                        <param name="movie" value="<?php echo root_url; ?>tv/MFPlayer.swf" />
+-                        <param name="quality" value="high" />
+-                        <param name="bgcolor" value="#869ca7" />
+-                        <param name="allowScriptAccess" value="sameDomain" />
+-                        <param name="allowFullScreen" value="true" />
+-                        <param name="FlashVars" value="file=<?php     echo video_url($program, 'flv');
+-                                                   ?>&still=<?php     echo $program->thumb_url($flv_w,$flv_h);
+-                                                   ?>&totalTime=<?php echo $program->length;
+-                                                   ?>&width=<?php     echo $flv_w;
+-                                                   ?>&height=<?php    echo $flv_h;
+-                                                   ?>&styles=<?php    echo root_url ?>tv/MFPlayer_styles.swf"
+-                                                   >
+-                        <embed src="<?php echo root_url; ?>tv/MFPlayer.swf" quality="high" bgcolor="#869ca7"
+-                            width="<?php echo $flv_w ?>" height="<?php echo $flv_h ?>" name="MFPlayer" align="middle"
+-                            play="true"
+-                            loop="false"
+-                            quality="high"
+-                            allowScriptAccess="sameDomain"
+-                            allowFullScreen="true"
+-                            FlashVars="file=<?php     echo video_url($program, 'flv');
+-                                   ?>&still=<?php     echo $program->thumb_url($flv_w,0);
+-                                   ?>&totalTime=<?php echo $program->length;
+-                                   ?>&width=<?php     echo $flv_w;
+-                                   ?>&height=<?php    echo $flv_h;
+-                                   ?>&styles=<?php    echo root_url ?>tv/MFPlayer_styles.swf"
+-                            type="application/x-shockwave-flash"
+-                            pluginspage="http://www.adobe.com/go/getflashplayer">
+-                        </embed>
+-                    </object>
+-                    </noscript>
+-<?php       } ?>
+-<?php   } else { ?>
+-                <a href="<?php echo $program->url ?>" title="<?php echo t('Direct Download') ?>"
+-                    ><img src="<?php echo $program->thumb_url($flv_w,0) ?>" width="<?php echo $flv_w ?>"></a>
+-<?php   } ?></td>
+             </div>
+             <div class="x-links">
+                 <a href="<?php echo video_url($program, 'asx') ?>" title="<?php echo t('ASX Stream') ?>"
+@@ -682,11 +549,6 @@
+                 <a href="<?php echo $program->url ?>" title="<?php echo t('Direct Download') ?>"
+                     ><img src="<?php echo skin_url ?>/img/video_sm.png">
+                     <?php echo t('Direct Download') ?></a>
+-                <?php if (setting('WebFLV_on') && file_exists('modules/tv/MFPlayer.swf')) { ?>
+-                    <a onclick="openFlashPlayerInNewWindow(); return false;" title="<?php echo t('Pop-out player'); ?>">
+-                        <?php echo t('Pop-out player'); ?>
+-                    </a>
+-                <?php } ?>
+             </div>
+             <div class="x-jobs">
+ <?php
+Index: mythweb/modules/tv/tmpl/default/recorded.php
+===================================================================
+--- mythweb/modules/tv/tmpl/default/recorded.php	(revision 24736)
++++ mythweb/modules/tv/tmpl/default/recorded.php	(working copy)
+@@ -110,7 +110,7 @@
+ 
+     function confirm_delete(id, forget_old) {
+         var file = files[id];
+-        if (confirm("<?php echo t('Are you sure you want to delete the following show?')
++        if (1 || confirm("<?php echo t('Are you sure you want to delete the following show?')
+                     ?>\n\n     "+file.title + ((file.subtitle == '') ? "" : ": " +file.subtitle))) {
+         // Do the actual deletion
+             if (programs_shown == 1)
+Index: mythweb/modules/stream/stream_mp4.pl
+===================================================================
+--- mythweb/modules/stream/stream_mp4.pl	(revision 24736)
++++ mythweb/modules/stream/stream_mp4.pl	(working copy)
+@@ -6,96 +6,88 @@
+ # @date      $Date$
+ # @version   $Revision$
+ # @author    $Author$
++#
+ 
+-    $| = 1;
++    use Math::Round qw(round_even);
+ 
+-    use HTTP::Date;
++    our $ffmpeg_pid;
+ 
+-    $filename =~ s/mpg$/mp4/g;
+-    $basename =~ s/mpg$/mp4/g;
+-
+-# File size
+-    my $size = -s $filename;
+-
+-# Zero bytes?
+-    if ($size < 1) {
+-        print header(),
+-              "$basename is an empty file.";
+-        exit;
++# Shutdown cleanup, of various types
++    $SIG{'TERM'} = \&shutdown_handler;
++    $SIG{'PIPE'} = \&shutdown_handler;
++    END {
++        shutdown_handler();
+     }
+-
+-# File type
+-    my $type   = 'video/mp4';
+-    my $suffix = '.mp4';
+-
+-# Open the file for reading
+-    unless (sysopen DATA, $filename, O_RDONLY) {
+-        print header(),
+-              "Can't read $basename:  $!";
+-        exit;
++    sub shutdown_handler {
++        kill(1, $ffmpeg_pid) if ($ffmpeg_pid);
+     }
+ 
+-# Binmode, in case someone is running this from Windows.
+-    binmode DATA;
+-
+-    my $start      = 0;
+-    my $end        = $size;
+-    my $total_size = $size;
+-    my $read_size  = 1024;
+-    my $mtime      = (stat($filename))[9];
+-
+-# Handle cache hits/misses
+-    if ( $ENV{'HTTP_IF_MODIFIED_SINCE'}) {
+-        my $check_time = str2time($ENV{'HTTP_IF_MODIFIED_SINCE'});
+-        if ($mtime <= $check_time) {
+-            print header(-Content_type           => $type,
+-                         -status                 => "304 Not Modified"
+-                        );
+-            exit;
++# Find ffmpeg
++    $ffmpeg = '';
++    foreach my $path (split(/:/, $ENV{'PATH'}.':/usr/local/bin:/usr/bin'), '.') {
++        if (-e "$path/ffmpeg") {
++            $ffmpeg = "$path/ffmpeg";
++            last;
+         }
++        elsif ($^O eq 'darwin' && -e "$path/ffmpeg.app") {
++            $ffmpeg = "$path/ffmpeg.app";
++            last;
++        }
+     }
+ 
+-# Requested a range?
+-    if ($ENV{'HTTP_RANGE'}) {
+-    # Figure out the size of the requested chunk
+-        ($start, $end) = $ENV{'HTTP_RANGE'} =~ /bytes\W+(\d*)-(\d*)\W*$/;
+-        if ($end < 1 || $end > $size) {
+-            $end = $size;
+-        }
+-        $size = $end - $start+1;
+-        if ($read_size > $size) {
+-            $read_size = $size;
+-        }
+-        print header(-status                 => "206 Partial Content",
+-                     -type                   => $type,
+-                     -Content_length         => $size,
+-                     -Accept_Ranges          => 'bytes',
+-                     -Content_Range          => "bytes $start-$end/$total_size",
+-                     -Last_Modified          => time2str($mtime)
+-                 );
++# Load some conversion settings from the database
++    $sh = $dbh->prepare('SELECT data FROM settings WHERE value=? AND hostname IS NULL');
++    $sh->execute('WebFLV_w');
++    my ($width)    = $sh->fetchrow_array;
++    $sh->execute('WebFLV_vb');
++    my ($vbitrate) = $sh->fetchrow_array;
++    $sh->execute('WebFLV_ab');
++    my ($abitrate) = $sh->fetchrow_array;
++    $sh->finish();
++
++# auto-detect height based on aspect ratio
++    $sh = $dbh->prepare('SELECT data FROM recordedmarkup WHERE chanid=? AND starttime=FROM_UNIXTIME(?) AND data IS NOT NULL ORDER BY data DESC');
++    $sh->execute($chanid,$starttime);
++    $x = $sh->fetchrow_array;
++    $y = $sh->fetchrow_array if ($x);
++    $width = round_even($width);
++    if ($x && $y) {
++        $height = round_even($width * ($y/$x));
++    } else {
++        $height = round_even($width * 3/4);
+     }
+-    else {
+-        print header(-type                  => $type,
+-                    -Content_length         => $size,
+-                    -Accept_Ranges          => 'bytes',
+-                    -Last_Modified          => time2str($mtime)
+-                 );
+-    }
++    $sh->finish();
+ 
+-# Seek to the requested position
+-    sysseek DATA, $start, 0;
++    $width    = 320 unless ($width    && $width    > 1);
++    $height   = 240 unless ($height   && $height   > 1);
++    $vbitrate = 256 unless ($vbitrate && $vbitrate > 1);
++    $abitrate = 64  unless ($abitrate && $abitrate > 1);
+ 
+-# Print the content to the browser
++    my $ffmpeg_command = $ffmpeg
++                        .' -y'
++                        .' -i '.shell_escape($filename)
++                        .' -s '.shell_escape("${width}x${height}")
++                        .' -g 30'
++                        .' -r 24'
++                        .' -f mp4'
++                        .' -deinterlace'
++                        .' -ac 2'
++                        .' -ar 11025'
++                        .' -ab '.shell_escape("${abitrate}k")
++                        .' -b '.shell_escape("${vbitrate}k")
++                        .' /dev/stdout 2>/dev/null |';
++
++# Print the movie
++    $ffmpeg_pid = open(DATA, $ffmpeg_command);
++    unless ($ffmpeg_pid) {
++        print header(),
++                "Can't do ffmpeg: $!\n${ffmpeg_command}";
++        exit;
++    }
++    print header(-type => 'video/mpeg');
+     my $buffer;
+-    while (sysread DATA, $buffer, $read_size ) {
++    while (read DATA, $buffer, 262144) {
+         print $buffer;
+-        $size -= $read_size;
+-        if ($size == 0) {
+-            last;
+-        }
+-        if ($size < $read_size) {
+-            $read_size = $size;
+-        }
+     }
+     close DATA;
+ 
+Index: mythweb/modules/stream/handler.pl
+===================================================================
+--- mythweb/modules/stream/handler.pl	(revision 24736)
++++ mythweb/modules/stream/handler.pl	(working copy)
+@@ -37,6 +37,10 @@
+     elsif ($ENV{'REQUEST_URI'} =~ /\.mp4$/i) {
+         require "modules/$Path[0]/stream_mp4.pl";
+     }
++# Ogg?
++    elsif ($ENV{'REQUEST_URI'} =~ /\.ogg$/i) {
++        require "modules/$Path[0]/stream_ogg.pl";
++    }
+ # Raw file?
+     else {
+         require "modules/$Path[0]/stream_raw.pl";
